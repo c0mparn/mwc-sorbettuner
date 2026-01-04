@@ -263,9 +263,9 @@ namespace SorbetTuner
             GUILayout.Label("🔌 ENGINE PARAMETERS", _headerStyle);
             
             // Get stock values for comparison
-            float stockHP = TuningManager.StockValues.Power;
-            float stockTorque = TuningManager.StockValues.Torque;
-            float stockRPM = TuningManager.StockValues.RevLimit;
+            float stockHP = TuningConstants.Stock.Power;
+            float stockTorque = TuningConstants.Stock.Torque;
+            float stockRPM = TuningConstants.Stock.RevLimit;
             
             // Power multiplier (capped at 2x)
             GUILayout.BeginHorizontal();
@@ -477,7 +477,7 @@ namespace SorbetTuner
             GUILayout.Label("Weight Stripping", GUILayout.Width(150));
             _tuningManager.WeightReduction = GUILayout.HorizontalSlider(
                 _tuningManager.WeightReduction, 0f, 50f);
-            float effectiveWeight = TuningManager.StockValues.Mass * (1 - _tuningManager.WeightReduction / 100f);
+            float effectiveWeight = TuningConstants.Stock.Mass * (1 - _tuningManager.WeightReduction / 100f);
             GUILayout.Label($"{_tuningManager.WeightReduction:F0}% ({effectiveWeight:F0}kg)", _valueStyle);
             GUILayout.EndHorizontal();
             
@@ -584,7 +584,7 @@ namespace SorbetTuner
             // Refresh car button
             if (GUILayout.Button("🔄 RE-SCAN FOR Sorbet", _buttonStyle))
             {
-                _tuningManager.FindSorbetCar();
+                _tuningManager.RefreshCarReference();
                 ShowStatus("BUS RESET - SCANNING...");
             }
         }
