@@ -6,14 +6,21 @@ using MelonLoader;
 namespace SorbetTuner
 {
     /// <summary>
-    /// Handles saving/loading settings and managing undo state.
+    /// Handles saving/loading settings and managing undo/redo state.
     /// </summary>
     public class SettingsManager
     {
         private readonly TuningManager _manager;
-        private TuningState _previousState;
         
-        public bool HasUndoState => _previousState != null;
+        // Stack-based undo/redo system
+        private readonly Stack<TuningState> _undoStack = new Stack<TuningState>();
+        private readonly Stack<TuningState> _redoStack = new Stack<TuningState>();
+        private const int MaxUndoLevels = 10;
+        
+        public bool HasUndoState => _undoStack.Count > 0;
+        public bool HasRedoState => _redoStack.Count > 0;
+        public int UndoCount => _undoStack.Count;
+        public int RedoCount => _redoStack.Count;
         
         public SettingsManager(TuningManager manager)
         {
@@ -32,10 +39,11 @@ namespace SorbetTuner
         
         private string GetSettingsDirectory()
         {
-            return Path.Combine(
-                Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location),
-                "SorbetTuner"
-            );
+            // Use Mods/SorbetTuner folder for consistency with preset storage
+            // .NET 3.5 only supports 2-argument Path.Combine
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Mods");
+            path = Path.Combine(path, "SorbetTuner");
+            return path;
         }
         
         private string GetSettingsPath()
@@ -48,7 +56,29 @@ namespace SorbetTuner
         /// </summary>
         public void SaveUndoState()
         {
-            _previousState = new TuningState
+            var state = CaptureCurrentState();
+            
+            // Limit undo stack size
+            if (_undoStack.Count >= MaxUndoLevels)
+            {
+                // Remove oldest state (convert to array, skip first, rebuild stack)
+                var states = _undoStack.ToArray();
+                _undoStack.Clear();
+                for (int i = states.Length - 2; i >= 0; i--)
+                {
+                    _undoStack.Push(states[i]);
+                }
+            }
+            
+            _undoStack.Push(state);
+            
+            // Clear redo stack when new action is taken
+            _redoStack.Clear();
+        }
+        
+        private TuningState CaptureCurrentState()
+        {
+            return new TuningState
             {
                 PowerMultiplier = _manager.Engine.PowerMultiplier,
                 TorqueMultiplier = _manager.Engine.TorqueMultiplier,
@@ -70,40 +100,71 @@ namespace SorbetTuner
             };
         }
         
+        private void ApplyState(TuningState state)
+        {
+            _manager.Engine.PowerMultiplier = state.PowerMultiplier;
+            _manager.Engine.TorqueMultiplier = state.TorqueMultiplier;
+            _manager.Engine.RevLimiter = state.RevLimiter;
+            _manager.Engine.BoostPressure = state.BoostPressure;
+            _manager.Engine.NitrousCharges = state.NitrousCharges;
+            _manager.Transmission.GearRatios = (float[])state.GearRatios.Clone();
+            _manager.Transmission.FinalDriveRatio = state.FinalDriveRatio;
+            _manager.Transmission.LaunchControlEnabled = state.LaunchControlEnabled;
+            _manager.Transmission.LaunchControlRPM = state.LaunchControlRPM;
+            _manager.Transmission.TractionControlEnabled = state.TractionControlEnabled;
+            _manager.Brakes.BrakeForce = state.BrakeForce;
+            _manager.Brakes.BrakeBias = state.BrakeBias;
+            _manager.Handling.WeightReduction = state.WeightReduction;
+            _manager.Handling.GripMultiplier = state.GripMultiplier;
+            _manager.Handling.CenterOfMassX = state.CenterOfMassX;
+            _manager.Handling.CenterOfMassY = state.CenterOfMassY;
+            _manager.Handling.CenterOfMassZ = state.CenterOfMassZ;
+        }
+        
         /// <summary>
         /// Restores the previous state (undo).
         /// </summary>
         public void Undo()
         {
-            if (_previousState == null)
+            if (_undoStack.Count == 0)
             {
                 MelonLogger.Warning("No undo state available!");
                 return;
             }
             
-            _manager.Engine.PowerMultiplier = _previousState.PowerMultiplier;
-            _manager.Engine.TorqueMultiplier = _previousState.TorqueMultiplier;
-            _manager.Engine.RevLimiter = _previousState.RevLimiter;
-            _manager.Engine.BoostPressure = _previousState.BoostPressure;
-            _manager.Engine.NitrousCharges = _previousState.NitrousCharges;
-            _manager.Transmission.GearRatios = (float[])_previousState.GearRatios.Clone();
-            _manager.Transmission.FinalDriveRatio = _previousState.FinalDriveRatio;
-            _manager.Transmission.LaunchControlEnabled = _previousState.LaunchControlEnabled;
-            _manager.Transmission.LaunchControlRPM = _previousState.LaunchControlRPM;
-            _manager.Transmission.TractionControlEnabled = _previousState.TractionControlEnabled;
-            _manager.Brakes.BrakeForce = _previousState.BrakeForce;
-            _manager.Brakes.BrakeBias = _previousState.BrakeBias;
-            _manager.Handling.WeightReduction = _previousState.WeightReduction;
-            _manager.Handling.GripMultiplier = _previousState.GripMultiplier;
-            _manager.Handling.CenterOfMassX = _previousState.CenterOfMassX;
-            _manager.Handling.CenterOfMassY = _previousState.CenterOfMassY;
-            _manager.Handling.CenterOfMassZ = _previousState.CenterOfMassZ;
+            // Save current state to redo stack before undoing
+            _redoStack.Push(CaptureCurrentState());
             
-            _previousState = null;
+            // Pop and apply the previous state
+            var previousState = _undoStack.Pop();
+            ApplyState(previousState);
             
             _manager.ApplyTuning();
-            MelonLogger.Msg("Undid last tuning change.");
+            MelonLogger.Msg($"Undid tuning change. ({_undoStack.Count} undo states remaining)");
         }
+        
+        /// <summary>
+        /// Restores the next state (redo).
+        /// </summary>
+        public void Redo()
+        {
+            if (_redoStack.Count == 0)
+            {
+                MelonLogger.Warning("No redo state available!");
+                return;
+            }
+            
+            // Save current state to undo stack before redoing
+            _undoStack.Push(CaptureCurrentState());
+            
+            // Pop and apply the redo state
+            var redoState = _redoStack.Pop();
+            ApplyState(redoState);
+            
+            _manager.ApplyTuning();
+            MelonLogger.Msg($"Redid tuning change. ({_redoStack.Count} redo states remaining)");
+        }
+
         
         /// <summary>
         /// Saves current settings to disk.

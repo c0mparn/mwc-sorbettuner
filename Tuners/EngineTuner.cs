@@ -76,6 +76,11 @@ namespace SorbetTuner.Tuners
             _carFinder = carFinder;
         }
         
+        // Track last applied values to reduce log spam
+        private float _lastAppliedTorque = -1f;
+        private float _lastAppliedPower = -1f;
+        private float _lastAppliedRPM = -1f;
+        
         /// <summary>
         /// Applies engine tuning to the drivetrain.
         /// </summary>
@@ -90,22 +95,52 @@ namespace SorbetTuner.Tuners
             
             // Apply torque multiplier
             float newTorque = _carFinder.OriginalMaxTorque * TorqueMultiplier;
-            ReflectionCache.SetValueWithLog(drivetrain, TuningConstants.FieldNames.Torque, newTorque, "maxTorque");
+            if (Mathf.Abs(newTorque - _lastAppliedTorque) > 0.1f)
+            {
+                if (ReflectionCache.SetValue(drivetrain, TuningConstants.FieldNames.Torque, newTorque))
+                {
+                    MelonLogger.Msg($"Set maxTorque: {_carFinder.OriginalMaxTorque:F0} Nm -> {newTorque:F0} Nm");
+                    _lastAppliedTorque = newTorque;
+                }
+            }
+            else
+            {
+                ReflectionCache.SetValue(drivetrain, TuningConstants.FieldNames.Torque, newTorque, false);
+            }
             
             // Apply power multiplier with turbo boost
             float turboMultiplier = 1f + (BoostPressure * TuningConstants.Timing.TurboBoostPerPSI);
             float nitrousMultiplier = IsNitrousActive ? TuningConstants.Timing.NitrousBoostMultiplier : 1f;
             float newPower = _carFinder.OriginalMaxPower * PowerMultiplier * turboMultiplier * nitrousMultiplier;
             
-            if (ReflectionCache.SetValue(drivetrain, TuningConstants.FieldNames.Power, newPower))
+            if (Mathf.Abs(newPower - _lastAppliedPower) > 0.1f)
             {
-                string turboInfo = BoostPressure > 0 ? $" [+{BoostPressure:F0} PSI]" : "";
-                string nitrousInfo = IsNitrousActive ? " [N2O]" : "";
-                MelonLogger.Msg($"Set maxPower: {_carFinder.OriginalMaxPower:F0} HP -> {newPower:F0} HP{turboInfo}{nitrousInfo}");
+                if (ReflectionCache.SetValue(drivetrain, TuningConstants.FieldNames.Power, newPower))
+                {
+                    string turboInfo = BoostPressure > 0 ? $" [+{BoostPressure:F0} PSI]" : "";
+                    string nitrousInfo = IsNitrousActive ? " [N2O]" : "";
+                    MelonLogger.Msg($"Set maxPower: {_carFinder.OriginalMaxPower:F0} HP -> {newPower:F0} HP{turboInfo}{nitrousInfo}");
+                    _lastAppliedPower = newPower;
+                }
+            }
+            else
+            {
+                ReflectionCache.SetValue(drivetrain, TuningConstants.FieldNames.Power, newPower, false);
             }
             
             // Apply rev limiter
-            ReflectionCache.SetValueWithLog(drivetrain, TuningConstants.FieldNames.RPM, RevLimiter, "maxRPM");
+            if (Mathf.Abs(RevLimiter - _lastAppliedRPM) > 1f)
+            {
+                if (ReflectionCache.SetValue(drivetrain, TuningConstants.FieldNames.RPM, RevLimiter))
+                {
+                    MelonLogger.Msg($"Set maxRPM: {RevLimiter:F0}");
+                    _lastAppliedRPM = RevLimiter;
+                }
+            }
+            else
+            {
+                ReflectionCache.SetValue(drivetrain, TuningConstants.FieldNames.RPM, RevLimiter, false);
+            }
         }
         
         /// <summary>

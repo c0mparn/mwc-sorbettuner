@@ -24,6 +24,7 @@ namespace SorbetTuner
         
         // Quick access properties
         public bool HasUndoState => Settings?.HasUndoState ?? false;
+        public bool HasRedoState => Settings?.HasRedoState ?? false;
         public bool CanUseNitrous => Engine?.CanUseNitrous ?? false;
         public bool IsNitrousActive => Engine?.IsNitrousActive ?? false;
         
@@ -156,6 +157,14 @@ namespace SorbetTuner
         public void Undo()
         {
             Settings.Undo();
+        }
+        
+        /// <summary>
+        /// Redoes the last undone change.
+        /// </summary>
+        public void Redo()
+        {
+            Settings.Redo();
         }
         
         /// <summary>

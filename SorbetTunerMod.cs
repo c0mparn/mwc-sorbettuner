@@ -116,6 +116,17 @@ namespace SorbetTuner
                 }
             }
             
+            // Ctrl+Y: Redo
+            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) 
+                && Input.GetKeyDown(KeyCode.Y) && _tuningManager != null)
+            {
+                if (_tuningManager.HasRedoState)
+                {
+                    _tuningManager.Redo();
+                    LoggerInstance.Msg("Ctrl+Y: Redid last change");
+                }
+            }
+            
             // N: Activate Nitrous
             if (Input.GetKeyDown(KeyCode.N) && _tuningManager != null)
             {

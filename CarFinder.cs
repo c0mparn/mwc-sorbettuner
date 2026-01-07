@@ -22,6 +22,10 @@ namespace SorbetTuner
         private bool _drivetrainAnalyzed;
         private bool _axlesAnalyzed;
         
+        // Throttling for fallback search (expensive operation)
+        private float _lastFallbackSearchTime = -10f;
+        private const float FallbackSearchCooldown = 1.0f; // Only search once per second
+        
         // Original values (for reset)
         private float _originalMass;
         private float _originalMaxTorque;
@@ -78,22 +82,26 @@ namespace SorbetTuner
             {
                 if (_carFound && _sorbetCar != null && _mainCarBody != null) return;
                 
-                // Search for car by name pattern
+                // Search for car by name pattern (fast)
                 root = GameObject.Find("SORBET(190-200psi)");
                 
                 if (root == null)
                 {
-                    // Fallback: search all GameObjects
-                    foreach (GameObject obj in GameObject.FindObjectsOfType<GameObject>())
+                    // Throttle the expensive fallback search
+                    if (Time.time - _lastFallbackSearchTime < FallbackSearchCooldown)
                     {
-                        if (obj.name.Contains("SORBET") && obj.name.Contains("psi"))
+                        return; // Skip this frame, try again later
+                    }
+                    _lastFallbackSearchTime = Time.time;
+                    
+                    // Fallback: search all Rigidbodies instead of all GameObjects (much faster)
+                    foreach (Rigidbody rb in UnityEngine.Object.FindObjectsOfType<Rigidbody>())
+                    {
+                        if (rb.mass > 500f && rb.gameObject.name.Contains("SORBET") && rb.gameObject.name.Contains("psi"))
                         {
-                            Rigidbody rb = obj.GetComponent<Rigidbody>();
-                            if (rb != null && rb.mass > 500f)
-                            {
-                                root = obj;
-                                break;
-                            }
+                            root = rb.gameObject;
+                            MelonLogger.Msg($"Found Sorbet via fallback search: {root.name}");
+                            break;
                         }
                     }
                 }

@@ -19,6 +19,7 @@ namespace SorbetTuner
             public const float FinalDrive = 3.94f;
             public const float BrakeBias = 0.6f;      // 60% front
             public const float LaunchControlRPM = 4500f;
+            public const float BrakeTorque = 2000f;   // Default brake torque
             
             public static readonly float[] GearRatios = new float[] 
             { 

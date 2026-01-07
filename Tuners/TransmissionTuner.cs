@@ -157,7 +157,10 @@ namespace SorbetTuner.Tuners
                     _lastRPMSet = targetRPM;
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"Launch control update error: {ex.Message}");
+            }
         }
         
         private void UpdateTractionControl(Component drivetrain, float speed, float originalTorque, float torqueMultiplier)
@@ -182,7 +185,10 @@ namespace SorbetTuner.Tuners
                     _tcActive = false;
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"Traction control update error: {ex.Message}");
+            }
         }
         
         /// <summary>

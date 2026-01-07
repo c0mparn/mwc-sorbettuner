@@ -29,7 +29,7 @@ namespace SorbetTuner.Tuners
         }
         
         // Cached original value
-        private float _originalBrakeTorque = 2000f;
+        private float _originalBrakeTorque = TuningConstants.Stock.BrakeTorque;
         private bool _originalCaptured = false;
         
         public BrakeTuner(CarFinder carFinder)

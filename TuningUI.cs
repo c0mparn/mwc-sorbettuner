@@ -36,6 +36,10 @@ namespace SorbetTuner
         private GUIStyle _valueStyle;
         private GUIStyle _buttonStyle;
         private GUIStyle _statusStyle;
+        private GUIStyle _centeredBoldStyle;
+        private GUIStyle _italicStyle;
+        private GUIStyle _smallLabelStyle;
+        private GUIStyle _shortcutHintStyle;
         private bool _stylesInitialized = false;
         
         // Colors (MWC Aesthetic)
@@ -61,6 +65,9 @@ namespace SorbetTuner
 
         private void CreateTextures()
         {
+            // Clean up any existing textures first to prevent leaks on re-initialization
+            DestroyTextures();
+            
             _windowBgTex = MakeTexture(2, 2, _bgColor);
             _tabBgTex = MakeTexture(2, 2, _tabBgColor);
             _tabActiveTex = MakeTexture(2, 2, _tabActiveColor);
@@ -68,6 +75,22 @@ namespace SorbetTuner
             _buttonHoverTex = MakeTexture(2, 2, new Color(0.35f, 0.35f, 0.35f));
             _sliderTrackTex = MakeTexture(2, 2, new Color(0.1f, 0.1f, 0.1f));
             _sliderThumbTex = MakeTexture(2, 2, _accentColor);
+        }
+        
+        private void DestroyTextures()
+        {
+            if (_windowBgTex != null) { Destroy(_windowBgTex); _windowBgTex = null; }
+            if (_tabBgTex != null) { Destroy(_tabBgTex); _tabBgTex = null; }
+            if (_tabActiveTex != null) { Destroy(_tabActiveTex); _tabActiveTex = null; }
+            if (_buttonTex != null) { Destroy(_buttonTex); _buttonTex = null; }
+            if (_buttonHoverTex != null) { Destroy(_buttonHoverTex); _buttonHoverTex = null; }
+            if (_sliderTrackTex != null) { Destroy(_sliderTrackTex); _sliderTrackTex = null; }
+            if (_sliderThumbTex != null) { Destroy(_sliderThumbTex); _sliderThumbTex = null; }
+        }
+        
+        private void OnDestroy()
+        {
+            DestroyTextures();
         }
 
         private Texture2D MakeTexture(int width, int height, Color color)
@@ -142,6 +165,29 @@ namespace SorbetTuner
                 normal = { textColor = Color.green },
                 alignment = TextAnchor.MiddleCenter
             };
+            
+            // Additional cached styles (avoid creating in OnGUI)
+            _centeredBoldStyle = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontStyle = FontStyle.Bold
+            };
+            
+            _italicStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontStyle = FontStyle.Italic
+            };
+            
+            _smallLabelStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 10
+            };
+            
+            _shortcutHintStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 9,
+                alignment = TextAnchor.MiddleCenter
+            };
 
             // Custom slider styles
             GUI.skin.horizontalSlider.normal.background = _sliderTrackTex;
@@ -203,7 +249,7 @@ namespace SorbetTuner
                 ? $"[ LINKED: {_tuningManager.GetCarName()} ]" 
                 : "[ SCANNING CONTROL BUS... ]";
             GUI.color = _tuningManager.IsCarFound() ? Color.green : Color.red;
-            GUILayout.Label(carStatus, new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold });
+            GUILayout.Label(carStatus, _centeredBoldStyle);
             GUI.color = Color.white;
             
             GUILayout.Space(5);
@@ -311,14 +357,6 @@ namespace SorbetTuner
             GUILayout.Label("💡 Green = increase | Yellow = decrease | Limit: 2x");
             GUI.color = Color.white;
 
-            GUILayout.Space(10);
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Fuel Efficiency", GUILayout.Width(120));
-            _tuningManager.FuelConsumption = GUILayout.HorizontalSlider(
-                _tuningManager.FuelConsumption, 0.1f, 3.0f);
-            GUILayout.Label($"{_tuningManager.FuelConsumption:F1}x burn", _valueStyle, GUILayout.Width(100));
-            GUILayout.EndHorizontal();
-
             GUILayout.Space(15);
             GUILayout.Label("🌀 FORCED INDUCTION", _headerStyle);
             
@@ -371,7 +409,7 @@ namespace SorbetTuner
             GUILayout.EndHorizontal();
             
             GUILayout.Space(10);
-            GUILayout.Label("Gear Ratios:", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Italic });
+            GUILayout.Label("Gear Ratios:", _italicStyle);
             GUILayout.Space(5);
             
             // Individual gear ratios
@@ -449,7 +487,7 @@ namespace SorbetTuner
             GUILayout.Space(15);
 
             // Visual brake bias indicator
-            GUILayout.Label("FLUID DISTRIBUTION:", new GUIStyle(GUI.skin.label) { fontSize = 10 });
+            GUILayout.Label("FLUID DISTRIBUTION:", _smallLabelStyle);
             GUILayout.BeginHorizontal();
             GUI.color = Color.red;
             GUILayout.Box("", GUILayout.Width(200 * _tuningManager.BrakeBias), GUILayout.Height(15));
@@ -489,25 +527,6 @@ namespace SorbetTuner
             _tuningManager.GripMultiplier = GUILayout.HorizontalSlider(
                 _tuningManager.GripMultiplier, 1.0f, 4.0f);
             GUILayout.Label($"{_tuningManager.GripMultiplier:F1}x", _valueStyle);
-            GUILayout.EndHorizontal();
-            
-            GUILayout.Space(10);
-            
-            // Top speed limiter
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Governor RPM/Speed", GUILayout.Width(150));
-            _tuningManager.TopSpeedLimit = GUILayout.HorizontalSlider(
-                _tuningManager.TopSpeedLimit, 0f, 250f);
-            string speedLabel = _tuningManager.TopSpeedLimit < 10 ? "OFF" : $"{_tuningManager.TopSpeedLimit:F0} km/h";
-            GUILayout.Label(speedLabel, _valueStyle);
-            GUILayout.EndHorizontal();
-
-            GUILayout.Space(10);
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Speedo Correction", GUILayout.Width(150));
-            _tuningManager.SpeedoCorrection = GUILayout.HorizontalSlider(
-                _tuningManager.SpeedoCorrection, 0.5f, 1.5f);
-            GUILayout.Label($"{_tuningManager.SpeedoCorrection:F2}x", _valueStyle);
             GUILayout.EndHorizontal();
 
             GUILayout.Space(20);
@@ -608,10 +627,19 @@ namespace SorbetTuner
             
             // Undo button (disabled if no undo state)
             GUI.enabled = _tuningManager.HasUndoState;
-            if (GUILayout.Button("↩ UNDO", _buttonStyle, GUILayout.Height(35), GUILayout.Width(80)))
+            if (GUILayout.Button("↩ UNDO", _buttonStyle, GUILayout.Height(35), GUILayout.Width(70)))
             {
                 _tuningManager.Undo();
                 ShowStatus("REVERTED TO PREVIOUS");
+            }
+            GUI.enabled = true;
+            
+            // Redo button (disabled if no redo state)
+            GUI.enabled = _tuningManager.HasRedoState;
+            if (GUILayout.Button("↪ REDO", _buttonStyle, GUILayout.Height(35), GUILayout.Width(70)))
+            {
+                _tuningManager.Redo();
+                ShowStatus("RESTORED CHANGE");
             }
             GUI.enabled = true;
             
@@ -626,7 +654,7 @@ namespace SorbetTuner
             
             // Keyboard shortcut hints
             GUI.color = new Color(0.5f, 0.5f, 0.5f);
-            GUILayout.Label("F9: Apply | F10: Reset | Ctrl+Z: Undo", new GUIStyle(GUI.skin.label) { fontSize = 9, alignment = TextAnchor.MiddleCenter });
+            GUILayout.Label("F9: Apply | F10: Reset | Ctrl+Z: Undo | Ctrl+Y: Redo", _shortcutHintStyle);
             GUI.color = Color.white;
         }
 
@@ -653,9 +681,34 @@ namespace SorbetTuner
             }
             return path;
         }
+        
+        /// <summary>
+        /// Sanitizes a preset name to be safe for use as a filename.
+        /// </summary>
+        private string SanitizePresetName(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return "Unnamed";
+            
+            // Remove invalid filename characters
+            char[] invalidChars = { '<', '>', ':', '"', '/', '\\', '|', '?', '*' };
+            foreach (char c in invalidChars)
+            {
+                name = name.Replace(c.ToString(), "");
+            }
+            
+            // Trim whitespace and limit length
+            name = name.Trim();
+            if (name.Length > 50) name = name.Substring(0, 50);
+            if (string.IsNullOrEmpty(name)) return "Unnamed";
+            
+            return name;
+        }
 
         private void SavePreset(string name)
         {
+            // Sanitize the preset name for safe file operations
+            name = SanitizePresetName(name);
+            
             try
             {
                 var preset = new TuningPreset
@@ -697,6 +750,9 @@ namespace SorbetTuner
 
         private void LoadPreset(string name)
         {
+            // Sanitize the preset name for safe file operations
+            name = SanitizePresetName(name);
+            
             try
             {
                 string path = Path.Combine(GetPresetsPath(), $"{name}.json");
@@ -714,7 +770,13 @@ namespace SorbetTuner
                 _tuningManager.RevLimiter = preset.RevLimiter;
                 _tuningManager.BoostPressure = preset.BoostPressure;
                 _tuningManager.NitrousCharges = preset.NitrousCharges;
-                _tuningManager.GearRatios = preset.GearRatios;
+                
+                // Validate GearRatios before assignment to prevent crash on malformed presets
+                if (preset.GearRatios != null && preset.GearRatios.Length == 5)
+                {
+                    _tuningManager.GearRatios = preset.GearRatios;
+                }
+                
                 _tuningManager.FinalDriveRatio = preset.FinalDriveRatio;
                 _tuningManager.LaunchControlEnabled = preset.LaunchControlEnabled;
                 _tuningManager.LaunchControlRPM = preset.LaunchControlRPM;
