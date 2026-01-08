@@ -192,8 +192,7 @@ namespace SorbetTuner
             // Custom slider styles
             GUI.skin.horizontalSlider.normal.background = _sliderTrackTex;
             GUI.skin.horizontalSliderThumb.normal.background = _sliderThumbTex;
-            GUI.skin.horizontalSliderThumb.fixedWidth = 12;
-            GUI.skin.horizontalSliderThumb.fixedHeight = 18;
+            // Note: Don't set fixedWidth/fixedHeight - causes hitbox misalignment
 
             _stylesInitialized = true;
         }
