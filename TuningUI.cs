@@ -364,7 +364,7 @@ namespace SorbetTuner
             GUILayout.BeginHorizontal();
             GUILayout.Label("Boost Pressure", GUILayout.Width(120));
             _tuningManager.BoostPressure = GUILayout.HorizontalSlider(
-                _tuningManager.BoostPressure, 0f, 20f);
+                _tuningManager.BoostPressure, 0f, TuningConstants.Limits.MaxBoostPSI);
             GUI.color = _tuningManager.BoostPressure > 0 ? Color.cyan : Color.white;
             float bar = _tuningManager.BoostPressure * 0.06895f;
             GUILayout.Label($"{_tuningManager.BoostPressure:F0} PSI / {bar:F1} BAR", _valueStyle, GUILayout.Width(140));
