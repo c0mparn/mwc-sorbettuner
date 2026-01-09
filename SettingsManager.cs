@@ -90,6 +90,7 @@ namespace SorbetTuner
                 LaunchControlEnabled = _manager.Transmission.LaunchControlEnabled,
                 LaunchControlRPM = _manager.Transmission.LaunchControlRPM,
                 TractionControlEnabled = _manager.Transmission.TractionControlEnabled,
+                DrivetrainMode = _manager.Transmission.DrivetrainMode,
                 BrakeForce = _manager.Brakes.BrakeForce,
                 BrakeBias = _manager.Brakes.BrakeBias,
                 WeightReduction = _manager.Handling.WeightReduction,
@@ -112,6 +113,7 @@ namespace SorbetTuner
             _manager.Transmission.LaunchControlEnabled = state.LaunchControlEnabled;
             _manager.Transmission.LaunchControlRPM = state.LaunchControlRPM;
             _manager.Transmission.TractionControlEnabled = state.TractionControlEnabled;
+            _manager.Transmission.DrivetrainMode = state.DrivetrainMode;
             _manager.Brakes.BrakeForce = state.BrakeForce;
             _manager.Brakes.BrakeBias = state.BrakeBias;
             _manager.Handling.WeightReduction = state.WeightReduction;
@@ -184,6 +186,7 @@ namespace SorbetTuner
                     $"LaunchControlEnabled={_manager.Transmission.LaunchControlEnabled}",
                     FormatSetting("LaunchControlRPM", _manager.Transmission.LaunchControlRPM),
                     $"TractionControlEnabled={_manager.Transmission.TractionControlEnabled}",
+                    $"DrivetrainMode={(int)_manager.Transmission.DrivetrainMode}",
                     FormatSetting("BrakeForce", _manager.Brakes.BrakeForce),
                     FormatSetting("BrakeBias", _manager.Brakes.BrakeBias),
                     FormatSetting("WeightReduction", _manager.Handling.WeightReduction),
@@ -255,6 +258,7 @@ namespace SorbetTuner
                 case "LaunchControlEnabled": _manager.Transmission.LaunchControlEnabled = bool.Parse(value); break;
                 case "LaunchControlRPM": _manager.Transmission.LaunchControlRPM = float.Parse(value, culture); break;
                 case "TractionControlEnabled": _manager.Transmission.TractionControlEnabled = bool.Parse(value); break;
+                case "DrivetrainMode": _manager.Transmission.DrivetrainMode = (DrivetrainMode)int.Parse(value); break;
                 case "BrakeForce": _manager.Brakes.BrakeForce = float.Parse(value, culture); break;
                 case "BrakeBias": _manager.Brakes.BrakeBias = float.Parse(value, culture); break;
                 case "WeightReduction": _manager.Handling.WeightReduction = float.Parse(value, culture); break;
@@ -285,6 +289,7 @@ namespace SorbetTuner
             public bool LaunchControlEnabled;
             public float LaunchControlRPM;
             public bool TractionControlEnabled;
+            public DrivetrainMode DrivetrainMode;
             public float BrakeForce;
             public float BrakeBias;
             public float WeightReduction;

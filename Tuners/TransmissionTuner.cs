@@ -16,6 +16,7 @@ namespace SorbetTuner.Tuners
         private float[] _gearRatios = (float[])TuningConstants.Stock.GearRatios.Clone();
         private float _finalDriveRatio = TuningConstants.Stock.FinalDrive;
         private float _launchControlRPM = TuningConstants.Stock.LaunchControlRPM;
+        private DrivetrainMode _drivetrainMode = DrivetrainMode.FWD; // Default to FWD (stock)
         
         // Gear ratio limits per gear
         private static readonly float[] MinGearRatios = { 2.0f, 1.2f, 0.8f, 0.6f, 0.4f };
@@ -50,6 +51,15 @@ namespace SorbetTuner.Tuners
         }
         
         public bool TractionControlEnabled { get; set; } = false;
+        
+        /// <summary>
+        /// Current drivetrain mode (RWD, AWD, FWD).
+        /// </summary>
+        public DrivetrainMode DrivetrainMode 
+        { 
+            get => _drivetrainMode;
+            set => _drivetrainMode = value;
+        }
         
         // Internal state
         private float _lastRPMSet = -1f;
@@ -86,6 +96,35 @@ namespace SorbetTuner.Tuners
             
             // Gear ratios
             ApplyGearRatios(drivetrain);
+            
+            // Drivetrain mode (RWD/AWD/FWD)
+            ApplyDrivetrainMode(drivetrain);
+        }
+        
+        private void ApplyDrivetrainMode(Component drivetrain)
+        {
+            var type = drivetrain.GetType();
+            var transmissionField = type.GetField("transmission", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            
+            if (transmissionField == null)
+            {
+                MelonLogger.Warning($"Drivetrain 'transmission' field not found.");
+                return;
+            }
+            
+            var enumType = transmissionField.FieldType;
+            
+            try
+            {
+                string modeName = DrivetrainMode.ToString();
+                object newValue = Enum.Parse(enumType, modeName, true);
+                transmissionField.SetValue(drivetrain, newValue);
+                MelonLogger.Msg($"Set drivetrain: {newValue}");
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"Failed to set transmission mode: {ex.Message}");
+            }
         }
         
         private void ApplyGearRatios(Component drivetrain)
@@ -201,6 +240,7 @@ namespace SorbetTuner.Tuners
             LaunchControlEnabled = false;
             _launchControlRPM = TuningConstants.Stock.LaunchControlRPM;
             TractionControlEnabled = false;
+            _drivetrainMode = DrivetrainMode.FWD; // Stock is FWD
         }
     }
 }

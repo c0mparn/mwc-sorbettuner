@@ -233,6 +233,7 @@ namespace SorbetTuner
         public bool LaunchControlEnabled { get => Transmission.LaunchControlEnabled; set => Transmission.LaunchControlEnabled = value; }
         public float LaunchControlRPM { get => Transmission.LaunchControlRPM; set => Transmission.LaunchControlRPM = value; }
         public bool TractionControlEnabled { get => Transmission.TractionControlEnabled; set => Transmission.TractionControlEnabled = value; }
+        public DrivetrainMode DrivetrainMode { get => Transmission.DrivetrainMode; set => Transmission.DrivetrainMode = value; }
         
         // Brakes
         public float BrakeForce { get => Brakes.BrakeForce; set => Brakes.BrakeForce = value; }

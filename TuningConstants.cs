@@ -3,6 +3,16 @@ using System;
 namespace SorbetTuner
 {
     /// <summary>
+    /// Drivetrain mode enum for RWD/AWD/FWD selection.
+    /// </summary>
+    public enum DrivetrainMode
+    {
+        RWD = 0,  // Rear-Wheel Drive
+        AWD = 1,  // All-Wheel Drive
+        FWD = 2   // Front-Wheel Drive
+    }
+    
+    /// <summary>
     /// Centralized constants for the Sorbet Tuner mod.
     /// Replaces magic numbers scattered throughout the codebase.
     /// </summary>
@@ -80,6 +90,7 @@ namespace SorbetTuner
             public static readonly string[] FinalDrive = { "finalDriveRatio", "FinalDriveRatio", "finalDrive", "diffRatio" };
             public static readonly string[] BrakeTorque = { "brakeFrictionTorque", "maxBrakeTorque", "brakeTorque", "brakeForce", "braking" };
             public static readonly string[] Grip = { "forwardGripFactor", "sidewaysGripFactor", "gripFactor", "grip" };
+            public static readonly string[] DrivetrainType = { "transmission", "driveType", "drive", "drivetrain", "transmissionType", "wheelDrive" };
         }
     }
 }

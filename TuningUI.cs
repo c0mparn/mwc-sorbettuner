@@ -450,6 +450,47 @@ namespace SorbetTuner
                 GUILayout.Label($"{_tuningManager.LaunchControlRPM:F0}", _valueStyle);
                 GUILayout.EndHorizontal();
             }
+            
+            GUILayout.Space(20);
+            GUILayout.Label("🔧 DRIVETRAIN MODE", _headerStyle);
+            
+            GUILayout.BeginHorizontal();
+            
+            // RWD Button
+            GUI.backgroundColor = _tuningManager.DrivetrainMode == DrivetrainMode.RWD ? _accentColor : Color.gray;
+            if (GUILayout.Button("RWD", _buttonStyle, GUILayout.Height(35)))
+            {
+                _tuningManager.DrivetrainMode = DrivetrainMode.RWD;
+            }
+            
+            // AWD Button
+            GUI.backgroundColor = _tuningManager.DrivetrainMode == DrivetrainMode.AWD ? _accentColor : Color.gray;
+            if (GUILayout.Button("AWD", _buttonStyle, GUILayout.Height(35)))
+            {
+                _tuningManager.DrivetrainMode = DrivetrainMode.AWD;
+            }
+            
+            // FWD Button
+            GUI.backgroundColor = _tuningManager.DrivetrainMode == DrivetrainMode.FWD ? _accentColor : Color.gray;
+            if (GUILayout.Button("FWD", _buttonStyle, GUILayout.Height(35)))
+            {
+                _tuningManager.DrivetrainMode = DrivetrainMode.FWD;
+            }
+            
+            GUI.backgroundColor = Color.white;
+            GUILayout.EndHorizontal();
+            
+            GUILayout.Space(5);
+            GUI.color = new Color(0.7f, 0.7f, 0.7f);
+            string modeDesc = "";
+            switch (_tuningManager.DrivetrainMode)
+            {
+                case DrivetrainMode.RWD: modeDesc = "💡 Rear-Wheel Drive - Power to rear wheels"; break;
+                case DrivetrainMode.AWD: modeDesc = "💡 All-Wheel Drive - Power to all wheels"; break;
+                case DrivetrainMode.FWD: modeDesc = "💡 Front-Wheel Drive - Power to front wheels (stock)"; break;
+            }
+            GUILayout.Label(modeDesc);
+            GUI.color = Color.white;
         }
 
         // ═══════════════════════════════════════════════════════════════
@@ -730,7 +771,8 @@ namespace SorbetTuner
                     TractionControlEnabled = _tuningManager.TractionControlEnabled,
                     CenterOfMassX = _tuningManager.CenterOfMassX,
                     CenterOfMassY = _tuningManager.CenterOfMassY,
-                    CenterOfMassZ = _tuningManager.CenterOfMassZ
+                    CenterOfMassZ = _tuningManager.CenterOfMassZ,
+                    DrivetrainMode = (int)_tuningManager.DrivetrainMode
                 };
 
                 string json = JsonConvert.SerializeObject(preset, Formatting.Indented);
@@ -788,6 +830,7 @@ namespace SorbetTuner
                 _tuningManager.CenterOfMassX = preset.CenterOfMassX;
                 _tuningManager.CenterOfMassY = preset.CenterOfMassY;
                 _tuningManager.CenterOfMassZ = preset.CenterOfMassZ;
+                _tuningManager.DrivetrainMode = (DrivetrainMode)preset.DrivetrainMode;
                 
                 MelonLogger.Msg($"Loaded preset: {path}");
                 ShowStatus($"✓ Loaded preset: {name}");

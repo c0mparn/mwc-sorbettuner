@@ -22,6 +22,7 @@ namespace SorbetTuner
         public float FinalDriveRatio = 3.94f;
         public bool LaunchControlEnabled = false;
         public float LaunchControlRPM = 4500f;
+        public int DrivetrainMode = 2; // 0=RWD, 1=AWD, 2=FWD (stock)
         
         // Brakes
         public float BrakeForce = 1.0f;
