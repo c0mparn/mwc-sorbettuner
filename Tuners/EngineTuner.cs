@@ -128,19 +128,7 @@ namespace SorbetTuner.Tuners
                 ReflectionCache.SetValue(drivetrain, TuningConstants.FieldNames.Power, newPower, false);
             }
             
-            // Apply rev limiter
-            if (Mathf.Abs(RevLimiter - _lastAppliedRPM) > 1f)
-            {
-                if (ReflectionCache.SetValue(drivetrain, TuningConstants.FieldNames.RPM, RevLimiter))
-                {
-                    MelonLogger.Msg($"Set maxRPM: {RevLimiter:F0}");
-                    _lastAppliedRPM = RevLimiter;
-                }
-            }
-            else
-            {
-                ReflectionCache.SetValue(drivetrain, TuningConstants.FieldNames.RPM, RevLimiter, false);
-            }
+            // Rev limiter disabled - modifying maxRPM causes physics instability
         }
         
         /// <summary>

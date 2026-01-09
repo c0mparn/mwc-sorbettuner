@@ -71,6 +71,9 @@ namespace SorbetTuner
             // Periodic analysis
             CarFinder.PeriodicAnalysis();
             
+            // Neutral safety: reduce torque when in neutral to prevent physics freakout
+            UpdateNeutralSafety();
+            
             // Nitrous timing
             if (Engine.UpdateNitrous())
             {
@@ -84,6 +87,41 @@ namespace SorbetTuner
                 Engine.TorqueMultiplier, 
                 Engine.IsNitrousActive
             );
+        }
+        
+        private bool _wasInNeutral = false;
+        
+        private void UpdateNeutralSafety()
+        {
+            var drivetrain = CarFinder.Drivetrain;
+            if (drivetrain == null) return;
+            
+            try
+            {
+                // Get current gear and neutral gear index
+                int currentGear = ReflectionCache.GetValue<int>(drivetrain, new[] { "gear" }, 1);
+                int neutralGear = ReflectionCache.GetValue<int>(drivetrain, new[] { "neutral" }, 1);
+                
+                bool isInNeutral = (currentGear == neutralGear);
+                
+                if (isInNeutral)
+                {
+                    // In neutral - continuously enforce reduced power to prevent R2D2 mode
+                    ReflectionCache.SetValue(drivetrain, TuningConstants.FieldNames.Torque, CarFinder.OriginalMaxTorque * 0.5f, false);
+                    ReflectionCache.SetValue(drivetrain, TuningConstants.FieldNames.Power, CarFinder.OriginalMaxPower, false);
+                    _wasInNeutral = true;
+                }
+                else if (_wasInNeutral)
+                {
+                    // Just left neutral - restore full power
+                    ApplyTuning();
+                    _wasInNeutral = false;
+                }
+            }
+            catch
+            {
+                // Silently ignore errors in gear detection
+            }
         }
         
         /// <summary>

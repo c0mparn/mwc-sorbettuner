@@ -337,18 +337,6 @@ namespace SorbetTuner
             GUI.color = Color.white;
             GUILayout.EndHorizontal();
             
-            GUILayout.Space(8);
-            
-            // Rev limiter
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("RPM Cut-off", GUILayout.Width(120));
-            _tuningManager.RevLimiter = GUILayout.HorizontalSlider(
-                _tuningManager.RevLimiter, 5000f, 8000f);
-            GUI.color = _tuningManager.RevLimiter > stockRPM ? Color.green : (Mathf.Abs(_tuningManager.RevLimiter - stockRPM) < 100 ? Color.white : Color.yellow);
-            GUILayout.Label($"{stockRPM:F0} → {_tuningManager.RevLimiter:F0}", _valueStyle, GUILayout.Width(100));
-            GUI.color = Color.white;
-            GUILayout.EndHorizontal();
-            
             GUILayout.Space(15);
             
             // Info box
