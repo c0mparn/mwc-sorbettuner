@@ -12,6 +12,7 @@ namespace SorbetTuner
         public override string Name => "Sorbet Tuner";
         public override string Author => "c0mparn";
         public override string Version => "1.4.0";
+        public override string Description => "Tune your Sorbet 1600 LTD with an in-game UI";
         public override Game SupportedGames => Game.MyWinterCar;
 
         public static SorbetTunerMod Instance { get; private set; }
