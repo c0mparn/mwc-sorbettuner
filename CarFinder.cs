@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using MelonLoader;
+using MSCLoader;
 
 namespace SorbetTuner
 {
@@ -100,7 +100,7 @@ namespace SorbetTuner
                         if (rb.mass > 500f && rb.gameObject.name.Contains("SORBET") && rb.gameObject.name.Contains("psi"))
                         {
                             root = rb.gameObject;
-                            MelonLogger.Msg($"Found Sorbet via fallback search: {root.name}");
+                            ModConsole.Print($"Found Sorbet via fallback search: {root.name}");
                             break;
                         }
                     }
@@ -117,7 +117,7 @@ namespace SorbetTuner
                 _originalMass = _mainCarBody.mass;
                 _carFound = true;
                 
-                MelonLogger.Msg($"Found Sorbet main body: {root.name}");
+                ModConsole.Print($"Found Sorbet main body: {root.name}");
                 
                 // Find all components
                 FindDrivetrain();
@@ -157,19 +157,19 @@ namespace SorbetTuner
                 if (typeName == "Drivetrain")
                 {
                     _drivetrain = c;
-                    MelonLogger.Msg("Found Drivetrain component!");
+                    ModConsole.Print("Found Drivetrain component!");
                     AnalyzeDrivetrain();
                 }
                 else if (typeName == "Axles")
                 {
                     _axles = c;
-                    MelonLogger.Msg("Found Axles component!");
+                    ModConsole.Print("Found Axles component!");
                 }
             }
             
             if (_drivetrain == null)
             {
-                MelonLogger.Warning("Drivetrain component not found!");
+                ModConsole.Print("Warning: Drivetrain component not found!");
             }
         }
         
@@ -225,11 +225,11 @@ namespace SorbetTuner
                 }
                 
                 _drivetrainAnalyzed = true;
-                MelonLogger.Msg("Drivetrain analyzed successfully.");
+                ModConsole.Print("Drivetrain analyzed successfully.");
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"Failed to analyze drivetrain: {ex.Message}");
+                ModConsole.Error($"Failed to analyze drivetrain: {ex.Message}");
             }
         }
         

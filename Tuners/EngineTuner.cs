@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using MelonLoader;
+using MSCLoader;
 
 namespace SorbetTuner.Tuners
 {
@@ -89,7 +89,7 @@ namespace SorbetTuner.Tuners
             var drivetrain = _carFinder.Drivetrain;
             if (drivetrain == null)
             {
-                MelonLogger.Warning("Drivetrain not found - cannot apply power/torque tuning");
+                ModConsole.Print("Warning: Drivetrain not found - cannot apply power/torque tuning");
                 return;
             }
             
@@ -99,7 +99,7 @@ namespace SorbetTuner.Tuners
             {
                 if (ReflectionCache.SetValue(drivetrain, TuningConstants.FieldNames.Torque, newTorque))
                 {
-                    MelonLogger.Msg($"Set maxTorque: {_carFinder.OriginalMaxTorque:F0} Nm -> {newTorque:F0} Nm");
+                    ModConsole.Print($"Set maxTorque: {_carFinder.OriginalMaxTorque:F0} Nm -> {newTorque:F0} Nm");
                     _lastAppliedTorque = newTorque;
                 }
             }
@@ -119,7 +119,7 @@ namespace SorbetTuner.Tuners
                 {
                     string turboInfo = BoostPressure > 0 ? $" [+{BoostPressure:F0} PSI]" : "";
                     string nitrousInfo = IsNitrousActive ? " [N2O]" : "";
-                    MelonLogger.Msg($"Set maxPower: {_carFinder.OriginalMaxPower:F0} HP -> {newPower:F0} HP{turboInfo}{nitrousInfo}");
+                    ModConsole.Print($"Set maxPower: {_carFinder.OriginalMaxPower:F0} HP -> {newPower:F0} HP{turboInfo}{nitrousInfo}");
                     _lastAppliedPower = newPower;
                 }
             }
@@ -142,7 +142,7 @@ namespace SorbetTuner.Tuners
             _nitrousActive = true;
             _nitrousEndTime = Time.time + TuningConstants.Timing.NitrousDuration;
             
-            MelonLogger.Msg($"NITROUS ACTIVATED! Charges left: {NitrousCharges}");
+            ModConsole.Print($"NITROUS ACTIVATED! Charges left: {NitrousCharges}");
             return true;
         }
         
@@ -155,7 +155,7 @@ namespace SorbetTuner.Tuners
             {
                 _nitrousActive = false;
                 _nitrousCooldownEnd = Time.time + TuningConstants.Timing.NitrousCooldown;
-                MelonLogger.Msg("Nitrous depleted. Entering cooldown.");
+                ModConsole.Print("Nitrous depleted. Entering cooldown.");
                 return true; // Signal to re-apply tuning
             }
             return false;

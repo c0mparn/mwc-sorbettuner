@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using MelonLoader;
+using MSCLoader;
 
 namespace SorbetTuner
 {
@@ -130,7 +130,7 @@ namespace SorbetTuner
         {
             if (_undoStack.Count == 0)
             {
-                MelonLogger.Warning("No undo state available!");
+                ModConsole.Print("Warning: No undo state available!");
                 return;
             }
             
@@ -142,7 +142,7 @@ namespace SorbetTuner
             ApplyState(previousState);
             
             _manager.ApplyTuning();
-            MelonLogger.Msg($"Undid tuning change. ({_undoStack.Count} undo states remaining)");
+            ModConsole.Print($"Undid tuning change. ({_undoStack.Count} undo states remaining)");
         }
         
         /// <summary>
@@ -152,7 +152,7 @@ namespace SorbetTuner
         {
             if (_redoStack.Count == 0)
             {
-                MelonLogger.Warning("No redo state available!");
+                ModConsole.Print("Warning: No redo state available!");
                 return;
             }
             
@@ -164,7 +164,7 @@ namespace SorbetTuner
             ApplyState(redoState);
             
             _manager.ApplyTuning();
-            MelonLogger.Msg($"Redid tuning change. ({_redoStack.Count} redo states remaining)");
+            ModConsole.Print($"Redid tuning change. ({_redoStack.Count} redo states remaining)");
         }
 
         
@@ -198,11 +198,11 @@ namespace SorbetTuner
                 };
                 
                 File.WriteAllLines(GetSettingsPath(), lines.ToArray());
-                MelonLogger.Msg($"Auto-saved settings to: {GetSettingsPath()}");
+                ModConsole.Print($"Auto-saved settings to: {GetSettingsPath()}");
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"Failed to save settings: {ex.Message}");
+                ModConsole.Error($"Failed to save settings: {ex.Message}");
             }
         }
         
@@ -228,12 +228,12 @@ namespace SorbetTuner
                     ApplySetting(key, value);
                 }
                 
-                MelonLogger.Msg($"Loaded last settings from: {path}");
+                ModConsole.Print($"Loaded last settings from: {path}");
                 return true;
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"Failed to load settings: {ex.Message}");
+                ModConsole.Error($"Failed to load settings: {ex.Message}");
             }
             return false;
         }

@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using MelonLoader;
+using MSCLoader;
 
 namespace SorbetTuner.Tuners
 {
@@ -50,14 +50,14 @@ namespace SorbetTuner.Tuners
                 var allWheelsField = ReflectionCache.GetField(axles.GetType(), new[] { "allWheels" });
                 if (allWheelsField == null)
                 {
-                    MelonLogger.Warning("Could not find allWheels field for brake tuning");
+                    ModConsole.Print("Warning: Could not find allWheels field for brake tuning");
                     return;
                 }
                 
                 Array wheels = allWheelsField.GetValue(axles) as Array;
                 if (wheels == null || wheels.Length == 0)
                 {
-                    MelonLogger.Warning("No wheels found for brake tuning");
+                    ModConsole.Print("Warning: No wheels found for brake tuning");
                     return;
                 }
                 
@@ -88,11 +88,11 @@ namespace SorbetTuner.Tuners
                     }
                 }
                 
-                MelonLogger.Msg($"Applied brake tuning to {wheelsModified} wheels (Force: {BrakeForce:F1}x, Bias: {BrakeBias * 100:F0}% front)");
+                ModConsole.Print($"Applied brake tuning to {wheelsModified} wheels (Force: {BrakeForce:F1}x, Bias: {BrakeBias * 100:F0}% front)");
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"Failed to apply brake tuning: {ex.Message}");
+                ModConsole.Error($"Failed to apply brake tuning: {ex.Message}");
             }
         }
         
@@ -105,7 +105,7 @@ namespace SorbetTuner.Tuners
             
             _originalBrakeTorque = ReflectionCache.GetValue<float>(firstWheel, TuningConstants.FieldNames.BrakeTorque, 2000f);
             _originalCaptured = true;
-            MelonLogger.Msg($"Captured original brake torque: {_originalBrakeTorque}");
+            ModConsole.Print($"Captured original brake torque: {_originalBrakeTorque}");
         }
         
         /// <summary>

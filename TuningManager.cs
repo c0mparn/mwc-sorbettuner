@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using UnityEngine;
-using MelonLoader;
+using MSCLoader;
 using SorbetTuner.Tuners;
 
 namespace SorbetTuner
@@ -30,7 +30,7 @@ namespace SorbetTuner
         
         private void Awake()
         {
-            MelonLogger.Msg("TuningManager Awake() - Initializing sub-managers...");
+            ModConsole.Print("TuningManager Awake() - Initializing sub-managers...");
             Instance = this;
             
             // Initialize sub-managers
@@ -51,17 +51,14 @@ namespace SorbetTuner
             // Try to find car if not found
             if (!CarFinder.IsCarFound)
             {
-                GameObject root = GameObject.Find("SORBET(190-200psi)");
-                if (root != null)
+                // FindSorbetCar handles multiple search patterns and fallbacks
+                CarFinder.FindSorbetCar();
+                
+                // Auto-load and apply settings on first find
+                if (CarFinder.IsCarFound && Settings.LoadSettings())
                 {
-                    CarFinder.FindSorbetCar(root);
-                    
-                    // Auto-load and apply settings on first find
-                    if (CarFinder.IsCarFound && Settings.LoadSettings())
-                    {
-                        MelonLogger.Msg("Auto-applying last tuning settings...");
-                        ApplyTuning();
-                    }
+                    ModConsole.Print("Auto-applying last tuning settings...");
+                    ApplyTuning();
                 }
                 return;
             }
@@ -131,7 +128,7 @@ namespace SorbetTuner
         {
             if (!CarFinder.IsCarFound)
             {
-                MelonLogger.Warning("Cannot apply tuning - car not found! Searching again...");
+                ModConsole.Print("Warning: Cannot apply tuning - car not found! Searching again...");
                 CarFinder.FindSorbetCar();
                 
                 if (!CarFinder.IsCarFound) return;
@@ -139,20 +136,20 @@ namespace SorbetTuner
             
             Settings.SaveUndoState();
             
-            MelonLogger.Msg("Applying tuning settings...");
+            ModConsole.Print("Applying tuning settings...");
             
             Handling.Apply();
             Engine.Apply();
             Transmission.Apply();
             Brakes.Apply();
             
-            MelonLogger.Msg("Tuning applied!");
-            MelonLogger.Msg($"  Rev Limit: {Engine.RevLimiter:F0} RPM");
-            MelonLogger.Msg($"  Final Drive: {Transmission.FinalDriveRatio:F2}");
+            ModConsole.Print("Tuning applied!");
+            ModConsole.Print($"  Rev Limit: {Engine.RevLimiter:F0} RPM");
+            ModConsole.Print($"  Final Drive: {Transmission.FinalDriveRatio:F2}");
             
             if (Handling.CenterOfMassX != 0 || Handling.CenterOfMassY != 0 || Handling.CenterOfMassZ != 0)
             {
-                MelonLogger.Msg($"  CoM Offset: X={Handling.CenterOfMassX:F2} Y={Handling.CenterOfMassY:F2} Z={Handling.CenterOfMassZ:F2}");
+                ModConsole.Print($"  CoM Offset: X={Handling.CenterOfMassX:F2} Y={Handling.CenterOfMassY:F2} Z={Handling.CenterOfMassZ:F2}");
             }
             
             Settings.SaveSettings();
@@ -186,7 +183,7 @@ namespace SorbetTuner
                 }
             }
             
-            MelonLogger.Msg("Reset all tuning to stock values.");
+            ModConsole.Print("Reset all tuning to stock values.");
         }
         
         /// <summary>

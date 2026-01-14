@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using MelonLoader;
+using MSCLoader;
 
 namespace SorbetTuner
 {
@@ -90,7 +90,7 @@ namespace SorbetTuner
                 if (field == null)
                 {
                     if (logOnFailure)
-                        MelonLogger.Warning($"Field not found: {fieldNames[0]} on {obj.GetType().Name}");
+                        ModConsole.Print($"Warning: Field not found: {fieldNames[0]} on {obj.GetType().Name}");
                     return false;
                 }
                 
@@ -102,7 +102,7 @@ namespace SorbetTuner
             catch (Exception ex)
             {
                 if (logOnFailure)
-                    MelonLogger.Error($"Failed to set {fieldNames[0]}: {ex.Message}");
+                    ModConsole.Error($"Failed to set {fieldNames[0]}: {ex.Message}");
                 return false;
             }
         }
@@ -119,7 +119,7 @@ namespace SorbetTuner
                 FieldInfo field = GetField(obj.GetType(), fieldNames);
                 if (field == null)
                 {
-                    MelonLogger.Warning($"{displayName ?? fieldNames[0]} field not found");
+                    ModConsole.Print($"Warning: {displayName ?? fieldNames[0]} field not found");
                     return false;
                 }
                 
@@ -127,12 +127,12 @@ namespace SorbetTuner
                 object convertedValue = Convert.ChangeType(newValue, field.FieldType);
                 field.SetValue(obj, convertedValue);
                 
-                MelonLogger.Msg($"Set {displayName ?? fieldNames[0]}: {oldValue} -> {newValue}");
+                ModConsole.Print($"Set {displayName ?? fieldNames[0]}: {oldValue} -> {newValue}");
                 return true;
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"Failed to set {displayName ?? fieldNames[0]}: {ex.Message}");
+                ModConsole.Error($"Failed to set {displayName ?? fieldNames[0]}: {ex.Message}");
                 return false;
             }
         }

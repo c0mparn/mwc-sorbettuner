@@ -1,39 +1,21 @@
 # Sorbet 1600 LTD Tuner
 
-A MelonLoader mod for **My Winter Car** that adds an in-game tuning UI for the Sorbet 1600 LTD daily driver.
+A MSCLoader mod for **My Winter Car** that adds an in-game tuning UI for the Sorbet 1600 LTD daily driver.
 
-![MelonLoader](https://img.shields.io/badge/MelonLoader-Compatible-green)
+![MSCLoader](https://img.shields.io/badge/MSCLoader-Compatible-green)
 ![Version](https://img.shields.io/badge/Version-1.0.0-blue)
 
 ## Features
 
-🔧 **Full In-Game Tuning UI** - Press `F8` to open
-
-### Engine Tuning
-- Power multiplier (up to 2x stock power = 144 HP)
-- Torque multiplier (up to 2x)
-- Adjustable rev limiter (5000-8000 RPM)
-- Turbo boost simulation (adds power based on PSI)
-- Nitrous oxide charges (press `N` to activate)
-- Fuel consumption modifier
-
-### Transmission Tuning
-- Individual gear ratios (1st through 5th)
-- Final drive ratio adjustment
-- Launch control system
-- Traction control assist
-
-### Brake Tuning
-- Brake force multiplier
-- Front/rear brake bias with visual indicator
-
-### Handling & Misc
-- Weight reduction (up to 50%)
-- Grip/traction multiplier
-- Center of mass adjustment (X/Y/Z)
-- Speedometer correction
-- De-ice windows feature
-- Save/load presets
+*   **Engine Tuning**: Adjust power and torque multipliers (up to 2x stock)
+*   **Forced Induction**: Add turbo boost (0-20 PSI)
+*   **Nitrous Oxide**: 5 shots of nitrous per session
+*   **Transmission**: Adjust final drive, gear ratios, and enable Launch Control
+*   **Drivetrain Swap**: Switch between FWD (Stock), RWD, and AWD
+*   **Suspension/Handling**: Adjust mass, center of mass, and grip
+*   **Brakes**: Tune brake force and bias
+*   **Save/Load**: Save your tuning setups to presets
+*   **Undo/Redo**: Safely experiment with undo/redo functionality
 
 ## Installation
 
@@ -92,17 +74,15 @@ You can share preset `.json` files with friends!
 ### "Car not found"
 - Make sure you're in the game world (not main menu)
 - Click "RE-SCAN FOR Sorbet" in the Misc tab
-- Check MelonLoader console for debug messages
-
-### UI not appearing
-- Ensure the mod loaded (check MelonLoader console on startup)
+- Check MSCLoader console for debug messages
+- Ensure the mod loaded (check MSCLoader console on startup)
 - Try pressing F8 multiple times
 - Make sure no other mod is using F8
 
 ## Credits
 
 - Made with ❤️ for the My Winter Car community
-- Uses [MelonLoader](https://melonwiki.xyz/)
+- Uses [MSCLoader](https://github.com/piotrulos/MSCloader)
 
 ## License
 

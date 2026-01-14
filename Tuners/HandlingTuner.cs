@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using MelonLoader;
+using MSCLoader;
 
 namespace SorbetTuner.Tuners
 {
@@ -73,7 +73,7 @@ namespace SorbetTuner.Tuners
             float newMass = _carFinder.OriginalMass * reductionMultiplier;
             newMass = Mathf.Max(newMass, TuningConstants.Limits.MinMass);
             
-            MelonLogger.Msg($"Adjusting mass: {_carFinder.OriginalMass:F0} kg -> {newMass:F0} kg");
+            ModConsole.Print($"Adjusting mass: {_carFinder.OriginalMass:F0} kg -> {newMass:F0} kg");
             carBody.mass = newMass;
         }
         
@@ -92,7 +92,7 @@ namespace SorbetTuner.Tuners
             
             if (offset != Vector3.zero)
             {
-                MelonLogger.Msg($"Applied Center of Mass offset: {offset}");
+                ModConsole.Print($"Applied Center of Mass offset: {offset}");
             }
         }
         
@@ -124,11 +124,11 @@ namespace SorbetTuner.Tuners
                         modified++;
                 }
                 
-                MelonLogger.Msg($"Applied grip multiplier {GripMultiplier:F1}x to {wheels.Length} wheels.");
+                ModConsole.Print($"Applied grip multiplier {GripMultiplier:F1}x to {wheels.Length} wheels.");
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"Failed to apply grip tuning: {ex.Message}");
+                ModConsole.Error($"Failed to apply grip tuning: {ex.Message}");
             }
         }
         
@@ -150,7 +150,7 @@ namespace SorbetTuner.Tuners
             var car = _carFinder.Car;
             if (car == null)
             {
-                MelonLogger.Warning("Cannot remove frost - car not found!");
+                ModConsole.Print("Warning: Cannot remove frost - car not found!");
                 return;
             }
             
@@ -196,7 +196,7 @@ namespace SorbetTuner.Tuners
                 }
             }
             
-            MelonLogger.Msg($"Defrost complete! Disabled {objectCount} objects and modified {matCount} materials.");
+            ModConsole.Print($"Defrost complete! Disabled {objectCount} objects and modified {matCount} materials.");
         }
         
         /// <summary>

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using UnityEngine;
-using MelonLoader;
+using MSCLoader;
 using Newtonsoft.Json;
 
 namespace SorbetTuner
@@ -200,28 +200,12 @@ namespace SorbetTuner
         public void ToggleVisibility()
         {
             _isVisible = !_isVisible;
-            // Note: Cursor visibility is forced in OnGUI while menu is open
-            // When closed, the game will restore its normal cursor state
-        }
-
-        private void LateUpdate()
-        {
-            // Force cursor visible every frame while menu is open
-            // Using LateUpdate to override after the game's Update sets it
-            if (_isVisible)
-            {
-                Cursor.visible = true;
-                Cursor.lockState = CursorLockMode.None;
-            }
+            // User uses ESC to get cursor - no cursor handling needed here
         }
 
         private void OnGUI()
         {
             if (!_isVisible || _tuningManager == null) return;
-            
-            // Force cursor visible in OnGUI - runs after all Update/LateUpdate
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
             
             InitializeStyles();
             
@@ -767,12 +751,12 @@ namespace SorbetTuner
                 string path = Path.Combine(GetPresetsPath(), $"{name}.json");
                 File.WriteAllText(path, json);
                 
-                MelonLogger.Msg($"Saved preset: {path}");
+                ModConsole.Print($"Saved preset: {path}");
                 ShowStatus($"✓ Saved preset: {name}");
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"Failed to save preset: {ex.Message}");
+                ModConsole.Error($"Failed to save preset: {ex.Message}");
                 ShowStatus($"✗ Failed to save: {ex.Message}");
             }
         }
@@ -820,12 +804,12 @@ namespace SorbetTuner
                 _tuningManager.CenterOfMassZ = preset.CenterOfMassZ;
                 _tuningManager.DrivetrainMode = (DrivetrainMode)preset.DrivetrainMode;
                 
-                MelonLogger.Msg($"Loaded preset: {path}");
+                ModConsole.Print($"Loaded preset: {path}");
                 ShowStatus($"✓ Loaded preset: {name}");
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"Failed to load preset: {ex.Message}");
+                ModConsole.Error($"Failed to load preset: {ex.Message}");
                 ShowStatus($"✗ Failed to load: {ex.Message}");
             }
         }

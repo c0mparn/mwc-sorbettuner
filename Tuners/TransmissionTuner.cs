@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 using UnityEngine;
-using MelonLoader;
+using MSCLoader;
 
 namespace SorbetTuner.Tuners
 {
@@ -87,7 +87,7 @@ namespace SorbetTuner.Tuners
             var drivetrain = _carFinder.Drivetrain;
             if (drivetrain == null)
             {
-                MelonLogger.Warning("Drivetrain not found - cannot apply transmission tuning");
+                ModConsole.Print("Warning: Drivetrain not found - cannot apply transmission tuning");
                 return;
             }
             
@@ -108,7 +108,7 @@ namespace SorbetTuner.Tuners
             
             if (transmissionField == null)
             {
-                MelonLogger.Warning($"Drivetrain 'transmission' field not found.");
+                ModConsole.Print($"Warning: Drivetrain 'transmission' field not found.");
                 return;
             }
             
@@ -119,11 +119,11 @@ namespace SorbetTuner.Tuners
                 string modeName = DrivetrainMode.ToString();
                 object newValue = Enum.Parse(enumType, modeName, true);
                 transmissionField.SetValue(drivetrain, newValue);
-                MelonLogger.Msg($"Set drivetrain: {newValue}");
+                ModConsole.Print($"Set drivetrain: {newValue}");
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"Failed to set transmission mode: {ex.Message}");
+                ModConsole.Error($"Failed to set transmission mode: {ex.Message}");
             }
         }
         
@@ -132,14 +132,14 @@ namespace SorbetTuner.Tuners
             var gearField = ReflectionCache.GetField(drivetrain.GetType(), TuningConstants.FieldNames.GearRatios);
             if (gearField == null)
             {
-                MelonLogger.Warning("gearRatios field not found");
+                ModConsole.Print("Warning: gearRatios field not found");
                 return;
             }
             
             float[] currentRatios = gearField.GetValue(drivetrain) as float[];
             if (currentRatios == null || currentRatios.Length < 7)
             {
-                MelonLogger.Warning("gearRatios array not found or too short.");
+                ModConsole.Print("Warning: gearRatios array not found or too short.");
                 return;
             }
             
@@ -150,7 +150,7 @@ namespace SorbetTuner.Tuners
                 newRatios[i + 2] = _gearRatios[i];
             }
             gearField.SetValue(drivetrain, newRatios);
-            MelonLogger.Msg("Updated gear ratios 1-5.");
+            ModConsole.Print("Updated gear ratios 1-5.");
         }
         
         /// <summary>
@@ -198,7 +198,7 @@ namespace SorbetTuner.Tuners
             }
             catch (Exception ex)
             {
-                MelonLogger.Warning($"Launch control update error: {ex.Message}");
+                ModConsole.Print($"Warning: Launch control update error: {ex.Message}");
             }
         }
         
@@ -226,7 +226,7 @@ namespace SorbetTuner.Tuners
             }
             catch (Exception ex)
             {
-                MelonLogger.Warning($"Traction control update error: {ex.Message}");
+                ModConsole.Print($"Warning: Traction control update error: {ex.Message}");
             }
         }
         
