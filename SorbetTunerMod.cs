@@ -10,7 +10,7 @@ namespace SorbetTuner
     {
         public override string ID => "SorbetTuner";
         public override string Name => "Sorbet Tuner";
-        public override string Author => "FirstMod";
+        public override string Author => "c0mparn";
         public override string Version => "1.4.0";
         public override Game SupportedGames => Game.MyWinterCar;
 

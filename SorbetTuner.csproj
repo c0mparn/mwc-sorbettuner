@@ -5,7 +5,7 @@
     <AssemblyName>SorbetTuner</AssemblyName>
     <Description>Tune your Sorbet 1600 LTD with an in-game UI</Description>
     <Version>1.4.0</Version>
-    <Authors>FirstMod</Authors>
+    <Authors>c0mparn</Authors>
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
